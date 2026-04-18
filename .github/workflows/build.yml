@@ -1,0 +1,22 @@
+name: Build EXE
+on: [push]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract and Build
+        run: |
+          Expand-Archive -Path "Sala system.zip" -DestinationPath "./project"
+          cd project
+          npm install
+          npm run build
+      - name: Make EXE
+        run: |
+          npx nativefier "./project/out" --name "SalaWaitingList" --platform "windows"
+          Compress-Archive -Path "SalaWaitingList-win32-x64" -DestinationPath "Sala-Setup.zip"
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-App
+          path: Sala-Setup.zip
